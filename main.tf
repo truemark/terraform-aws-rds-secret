@@ -19,7 +19,7 @@ resource "random_password" "secret" {
 
 resource "aws_secretsmanager_secret" "secret" {
   count = var.create ? 1 : 0
-  name_prefix = "database/${var.identifier}/${var.name}-"
+  name_prefix = "database/${var.identifier}/${var.username == null ? var.name : var.username}-"
   description = "Application password for RDS ${var.cluster ? "Cluster" : "Instance"} ${var.identifier}"
   tags = var.tags
 }
