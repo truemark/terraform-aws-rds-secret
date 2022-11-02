@@ -24,16 +24,27 @@ resource "aws_secretsmanager_secret" "secret" {
   tags = var.tags
 }
 
-resource "aws_secretsmanager_secret_version" "secret" {
-  count = var.create ? 1 : 0
+resource "aws_secretsmanager_secret_version" "cluster_secret" {
+  count = var.create && var.cluster? 1 : 0
   secret_id = aws_secretsmanager_secret.secret[count.index].id
   secret_string = jsonencode({
-    host = data.aws_rds_cluster.cluster.endpoint
-    port = data.aws_rds_cluster.cluster.port
-    dbname = var.database_name == null ? data.aws_rds_cluster.cluster.database_name : var.database_name
+    host = data.aws_rds_cluster.cluster[count.index].endpoint
+    port = data.aws_rds_cluster.cluster[count.index].port
+    dbname = var.database_name == null ? data.aws_rds_cluster.cluster[count.index].database_name : var.database_name
     username = var.username == null ? var.name : var.username
     password = random_password.secret[count.index].result
   })
 }
 
+resource "aws_secretsmanager_secret_version" "instance_secret" {
+  count = var.create && !var.cluster? 1 : 0
+  secret_id = aws_secretsmanager_secret.secret[count.index].id
+  secret_string = jsonencode({
+    host = data.aws_db_instance.instance[count.index].endpoint
+    port = data.aws_db_instance.instance[count.index].port
+    dbname = var.database_name == null ? data.aws_db_instance.instance[count.index].db_name : var.database_name
+    username = var.username == null ? var.name : var.username
+    password = random_password.secret[count.index].result
+  })
+}
 
