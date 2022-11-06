@@ -28,7 +28,7 @@ resource "aws_secretsmanager_secret_version" "cluster_secret" {
   count = var.create && var.cluster? 1 : 0
   secret_id = aws_secretsmanager_secret.secret[count.index].id
   secret_string = jsonencode({
-    host = data.aws_rds_cluster.cluster[count.index].address
+    host = data.aws_rds_cluster.cluster[count.index].endpoint
     port = data.aws_rds_cluster.cluster[count.index].port
     dbname = var.database_name == null ? data.aws_rds_cluster.cluster[count.index].database_name : var.database_name
     username = var.username == null ? var.name : var.username
