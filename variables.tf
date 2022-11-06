@@ -5,7 +5,7 @@ variable "create" {
 }
 
 variable "identifier" {
-  description = "RDS Cluster identifier"
+  description = "RDS Cluster or Instance identifier"
   type = string
 }
 
@@ -26,6 +26,13 @@ variable "username" {
   default = null
 }
 
+variable "password" {
+  description = "Optional password. If null, one is generated."
+  type = string
+  default = null
+  sensitive = true
+}
+
 variable "database_name" {
   description = "Optional name of the database the credentials are for. If null, cluster_database_name is used."
   type = string
@@ -42,5 +49,23 @@ variable "password_length" {
   description = "Length of the password to generate."
   type = number
   default = 12
+}
+
+variable "min_numeric" {
+  description = "Minimum number of numeric characters when generating passwords."
+  type = number
+  default = 1
+}
+
+variable "min_upper" {
+  description = "Minimum number of upper case characters when generating passwords."
+  type = number
+  default = 1
+}
+
+variable "min_lower" {
+  description = "Minimum number of lower case characters when generating passwords."
+  type = number
+  default = 1
 }
 

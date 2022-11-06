@@ -9,17 +9,17 @@ data "aws_db_instance" "instance" {
 }
 
 resource "random_password" "secret" {
-  count = var.create ? 1 : 0
+  count = var.create && var.password == null ? 1 : 0
   length  = var.password_length
   special = false
-  min_upper = 1
-  min_lower = 1
-  min_numeric = 1
+  min_upper = var.min_upper
+  min_lower = var.min_lower
+  min_numeric = var.min_numeric
 }
 
 resource "aws_secretsmanager_secret" "secret" {
   count = var.create ? 1 : 0
-  name_prefix = "database/${var.identifier}/${var.username == null ? var.name : var.username}-"
+  name_prefix = "database/${var.identifier}/${var.name != null ? var.name : var.username}-"
   description = "Application password for RDS ${var.cluster ? "Cluster" : "Instance"} ${var.identifier}"
   tags = var.tags
 }
@@ -32,7 +32,7 @@ resource "aws_secretsmanager_secret_version" "cluster_secret" {
     port = data.aws_rds_cluster.cluster[count.index].port
     dbname = var.database_name == null ? data.aws_rds_cluster.cluster[count.index].database_name : var.database_name
     username = var.username == null ? var.name : var.username
-    password = random_password.secret[count.index].result
+    password = var.password != null ? var.password : join("", random_password.secret.*.result)
   })
 }
 
@@ -44,7 +44,7 @@ resource "aws_secretsmanager_secret_version" "instance_secret" {
     port = data.aws_db_instance.instance[count.index].port
     dbname = var.database_name == null ? data.aws_db_instance.instance[count.index].db_name : var.database_name
     username = var.username == null ? var.name : var.username
-    password = random_password.secret[count.index].result
+    password = var.password != null ? var.password : join("", random_password.secret.*.result)
   })
 }
 
