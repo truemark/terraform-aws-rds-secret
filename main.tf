@@ -31,7 +31,7 @@ resource "aws_secretsmanager_secret" "secret" {
   count       = var.create ? 1 : 0
   name_prefix = "database/${var.identifier}/${var.name != null ? var.name : var.username}-"
   description = "Application password for RDS ${var.cluster ? "Cluster" : "Instance"} ${var.identifier}"
-  tags        = merge(module.standard_tags.tags, var.tags)
+  tags        = merge(var.tags, module.standard_tags.tags)
 }
 
 resource "aws_secretsmanager_secret_version" "cluster_secret" {
