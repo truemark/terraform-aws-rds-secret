@@ -1,3 +1,13 @@
+module "standard_tags" {
+  source  = "truemark/standard-tags/aws"
+  version = "1.0.0"
+  automation_component = {
+    id = "terraform-aws-rds-secret"
+    url = "https://registry.terraform.io/modules/truemark/standard-tags"
+    vendor = "TrueMark"
+  }
+}
+
 data "aws_rds_cluster" "cluster" {
   count              = var.cluster ? 1 : 0
   cluster_identifier = var.identifier
@@ -21,7 +31,7 @@ resource "aws_secretsmanager_secret" "secret" {
   count       = var.create ? 1 : 0
   name_prefix = "database/${var.identifier}/${var.name != null ? var.name : var.username}-"
   description = "Application password for RDS ${var.cluster ? "Cluster" : "Instance"} ${var.identifier}"
-  tags        = var.tags
+  tags        = merge(module.standard_tags.tags, var.tags)
 }
 
 resource "aws_secretsmanager_secret_version" "cluster_secret" {
