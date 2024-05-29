@@ -13,9 +13,16 @@ data "aws_rds_cluster" "cluster" {
   cluster_identifier = var.identifier
 }
 
+data "aws_db_instances" "instances" {
+  filter {
+    name   = "db-instance-id"
+    values = [var.identifier]
+  }
+}
+
 data "aws_db_instance" "instance" {
   count                  = var.cluster ? 0 : 1
-  db_instance_identifier = var.identifier
+  db_instance_identifier = data.aws_db_instances.instances.instance_identifiers[0]
 }
 
 resource "random_password" "secret" {
