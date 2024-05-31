@@ -28,7 +28,7 @@ data "aws_db_instance" "instance" {
 resource "random_password" "secret" {
   count       = var.create ? 1 : 0
   length      = var.password_length
-  special     = false
+  special     = var.special
   min_upper   = var.min_upper
   min_lower   = var.min_lower
   min_numeric = var.min_numeric

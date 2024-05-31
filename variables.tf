@@ -69,3 +69,8 @@ variable "min_lower" {
   default     = 1
 }
 
+variable "special" {
+  description = "Whether to include special characters when generating passwords."
+  type        = bool
+  default     = false
+}
